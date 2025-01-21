@@ -3,7 +3,8 @@
 	"package": "com.deathplus.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"PlayerDeathDropMixin"
+		"PlayerDeathDropMixin",
+		"PlayerDeathMessageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
