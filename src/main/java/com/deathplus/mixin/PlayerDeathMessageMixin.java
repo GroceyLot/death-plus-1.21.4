@@ -39,9 +39,7 @@ public abstract class PlayerDeathMessageMixin {
 
         // Play a bell sound for all players on the server
         if (ConfigLoader.enableBellSound) {
-            server.getPlayerManager().getPlayerList().forEach(p -> {
-                p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F);
-            });
+            server.getPlayerManager().getPlayerList().forEach(p -> p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F));
         }
     }
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class ConfigLoader {
 
@@ -20,7 +19,7 @@ public class ConfigLoader {
 
     // Configuration fields
     public static boolean enableOneBlockDrops = true;
-    public static List<String> tauntMessages = new ArrayList<String>();
+    public static List<String> tauntMessages = new ArrayList<>();
     public static boolean enableBellSound = true;
 
     private static final Gson gson = new Gson();
@@ -46,7 +45,7 @@ public class ConfigLoader {
                     enableBellSound = config.enableBellSound;
                 }
             } catch (IOException | JsonSyntaxException e) {
-                DeathPlus.LOGGER.error("Failed to load configuration: " + e.getMessage());
+                DeathPlus.LOGGER.error("Failed to load configuration: {}", e.getMessage());
             }
         } else {
             saveDefaultConfig();
@@ -62,7 +61,7 @@ public class ConfigLoader {
         // Ensure the directory exists
         if (!configDir.exists()) {
             if (!configDir.mkdirs()) {
-                DeathPlus.LOGGER.error("Failed to create directory: " + configDir.getAbsolutePath());
+                DeathPlus.LOGGER.error("Failed to create directory: {}", configDir.getAbsolutePath());
                 return;
             }
         }
@@ -73,7 +72,7 @@ public class ConfigLoader {
             gson.toJson(defaultConfig, writer);
             DeathPlus.LOGGER.info("Default configuration saved to " + CONFIG_FILE_PATH);
         } catch (IOException e) {
-            DeathPlus.LOGGER.error("Failed to save default configuration: " + e.getMessage());
+            DeathPlus.LOGGER.error("Failed to save default configuration: {}", e.getMessage());
         }
     }
 
@@ -89,9 +88,5 @@ public class ConfigLoader {
             this.tauntMessages = tauntMessages != null ? tauntMessages : new ArrayList<>();
             this.enableBellSound = enableBellSound;
         }
-    }
-
-    public static boolean isLoaded() {
-        return isLoaded;
     }
 }

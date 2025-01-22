@@ -8,6 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,9 +24,8 @@ public abstract class PlayerDeathDropMixin {
 		PlayerEntity player = (PlayerEntity) (Object) this;
 		World world = player.getWorld();
 
-		if (!world.isClient && world instanceof ServerWorld) {
-			ServerWorld serverWorld = (ServerWorld) world;
-			BlockPos deathPos = player.getBlockPos();
+		if (!world.isClient && world instanceof ServerWorld serverWorld) {
+            BlockPos deathPos = player.getBlockPos();
 
 			// Drop all inventory items directly at the player's death position
 			for (ItemStack stack : player.getInventory().main) {
@@ -46,6 +46,7 @@ public abstract class PlayerDeathDropMixin {
 		}
 	}
 
+	@Unique
 	private void dropItem(ServerWorld world, BlockPos pos, ItemStack stack) {
 		if (!stack.isEmpty()) {
 			ItemEntity itemEntity = new ItemEntity(
