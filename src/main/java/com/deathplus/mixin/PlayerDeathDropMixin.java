@@ -1,5 +1,6 @@
 package com.deathplus.mixin;
 
+import com.deathplus.ConfigLoader;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -16,6 +17,9 @@ public abstract class PlayerDeathDropMixin {
 
 	@Inject(method = "dropInventory", at = @At("HEAD"), cancellable = true)
 	private void onPlayerDeath(CallbackInfo ci) {
+		if (!ConfigLoader.enableOneBlockDrops) {
+			return;
+		}
 		PlayerEntity player = (PlayerEntity) (Object) this;
 		World world = player.getWorld();
 

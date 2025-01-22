@@ -12,5 +12,6 @@ public class DeathPlus implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ConfigLoader.loadData();
 	}
 }
