@@ -1,5 +1,6 @@
 package com.deathplus.mixin;
 
+import com.deathplus.AiTaunts;
 import com.deathplus.ConfigLoader;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
@@ -30,16 +31,19 @@ public abstract class PlayerDeathMessageMixin {
     private void onDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        // Broadcast a message to the server
-        if (!ConfigLoader.tauntMessages.isEmpty()) {
-            Text deathMessage = Text.literal(String.format(ConfigLoader.tauntMessages.get(random.nextInt(ConfigLoader.tauntMessages.size())), player.getName().getString()))
-                    .formatted(Formatting.RED);
-            server.getPlayerManager().broadcast(deathMessage, false);
-        }
-
         // Play a bell sound for all players on the server
         if (ConfigLoader.enableBellSound) {
             server.getPlayerManager().getPlayerList().forEach(p -> p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F));
+        }
+
+
+        // Broadcast a message to the server
+        if (ConfigLoader.useAiTaunts) {
+            AiTaunts.taunt(server, player, source);
+        } else if (!ConfigLoader.tauntMessages.isEmpty()) {
+            Text deathMessage = Text.literal(String.format(ConfigLoader.tauntMessages.get(random.nextInt(ConfigLoader.tauntMessages.size())), player.getName().getString()))
+                    .formatted(Formatting.RED);
+            server.getPlayerManager().broadcast(deathMessage, false);
         }
     }
 }
