@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class PlayerDeathMessageMixin {
@@ -27,23 +29,29 @@ public abstract class PlayerDeathMessageMixin {
     @Unique
     private final Random random = new Random();
 
+    @Unique
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
+
     @Inject(method = "onDeath", at = @At("TAIL"))
     private void onDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
         // Play a bell sound for all players on the server
         if (ConfigLoader.enableBellSound) {
-            server.getPlayerManager().getPlayerList().forEach(p -> p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F));
+            server.getPlayerManager().getPlayerList().forEach(p ->
+                    p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F)
+            );
         }
 
-
-        // Broadcast a message to the server
-        if (ConfigLoader.useAiTaunts) {
-            AiTaunts.taunt(server, player, source);
-        } else if (!ConfigLoader.tauntMessages.isEmpty()) {
-            Text deathMessage = Text.literal(String.format(ConfigLoader.tauntMessages.get(random.nextInt(ConfigLoader.tauntMessages.size())), player.getName().getString()))
-                    .formatted(Formatting.RED);
-            server.getPlayerManager().broadcast(deathMessage, false);
-        }
+        // Broadcast a taunt message in a separate thread
+        executor.execute(() -> {
+            if (ConfigLoader.useAiTaunts) {
+                AiTaunts.taunt(server, player, source);
+            } else if (!ConfigLoader.tauntMessages.isEmpty()) {
+                Text deathMessage = Text.literal(String.format(ConfigLoader.tauntMessages.get(random.nextInt(ConfigLoader.tauntMessages.size())), player.getName().getString()))
+                        .formatted(Formatting.RED);
+                server.getPlayerManager().broadcast(deathMessage, false);
+            }
+        });
     }
 }
