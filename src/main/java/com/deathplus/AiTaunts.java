@@ -14,11 +14,39 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import com.google.gson.Gson;
 
 public class AiTaunts {
-    private static final String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY"); // Replace with your OpenAI API key
+    private static final String OPENAI_API_KEY;
+
+    static {
+        String envApiKey = null;
+
+        // Attempt to load from .env file first
+        try {
+            Dotenv dotenv = Dotenv.configure().directory("./").ignoreIfMissing().load();
+            envApiKey = dotenv.get("OPENAI_API_KEY");
+            System.out.println("Loaded API Key from .env: " + (envApiKey != null ? "FOUND" : "NOT FOUND"));
+        } catch (Exception e) {
+            System.out.println("Failed to load .env file: " + e.getMessage());
+        }
+
+        // If not found in .env, fall back to environment variables
+        if (envApiKey == null || envApiKey.isEmpty()) {
+            envApiKey = System.getenv("OPENAI_API_KEY");
+            System.out.println("Loaded API Key from environment variables: " + (envApiKey != null ? "FOUND" : "NOT FOUND"));
+        }
+
+        OPENAI_API_KEY = envApiKey;
+
+        if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
+            System.out.println("ERROR: OpenAI API Key is missing. Check your .env file and environment variables.");
+        } else {
+            System.out.println("OpenAI API Key successfully loaded.");
+        }
+    }
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     private static final List<Map<String, Object>> messages = new ArrayList<>();
     private static final Map<UUID, List<Instant>> playerTauntTimestamps = new ConcurrentHashMap<>(); // Tracks player taunt timestamps
@@ -54,7 +82,6 @@ public class AiTaunts {
             }
 
             if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
-                DeathPlus.LOGGER.error("OpenAI API key not found in environment variables.");
                 return;
             }
 
