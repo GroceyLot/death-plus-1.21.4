@@ -22,7 +22,7 @@ public class ConfigLoader {
     public static List<String> tauntMessages = new ArrayList<>();
     public static boolean enableBellSound = true;
     public static boolean useAiTaunts = false;
-    public static String aiTauntModel = "gpt-4o-mini";
+    public static String aiTauntModel = "gpt-4.1-nano";
     public static Integer aiRateLimit = 5;
     public static int aiCooldownMinutes = 5;
 

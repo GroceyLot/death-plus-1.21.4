@@ -1,11 +1,14 @@
 package com.deathplus.mixin;
 
 import com.deathplus.ConfigLoader;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerDeathDropMixin {
-
 	@Inject(method = "dropInventory", at = @At("HEAD"), cancellable = true)
 	private void onPlayerDeath(CallbackInfo ci) {
 		if (!ConfigLoader.enableOneBlockDrops) {
@@ -25,16 +27,10 @@ public abstract class PlayerDeathDropMixin {
 		World world = player.getWorld();
 
 		if (!world.isClient && world instanceof ServerWorld serverWorld) {
-            BlockPos deathPos = player.getBlockPos();
+			BlockPos deathPos = player.getBlockPos();
 
-			// Drop all inventory items directly at the player's death position
-			for (ItemStack stack : player.getInventory().main) {
-				dropItem(serverWorld, deathPos, stack);
-			}
-			for (ItemStack stack : player.getInventory().armor) {
-				dropItem(serverWorld, deathPos, stack);
-			}
-			for (ItemStack stack : player.getInventory().offHand) {
+			// Drop all items in the player's inventory
+			for (ItemStack stack : player.getInventory()) {
 				dropItem(serverWorld, deathPos, stack);
 			}
 

@@ -53,6 +53,9 @@ public class AiTaunts {
 
 
     public static void taunt(MinecraftServer server, ServerPlayerEntity player, DamageSource death) {
+        if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
+            return;
+        }
         UUID playerId = player.getUuid();
         Instant now = Instant.now();
 
@@ -80,11 +83,6 @@ public class AiTaunts {
                 // Add current timestamp to the list
                 timestamps.add(now);
             }
-
-            if (OPENAI_API_KEY == null || OPENAI_API_KEY.isEmpty()) {
-                return;
-            }
-
             // Prepare the request body
             Gson gson = new Gson();
             String deathMessage = death.getDeathMessage(player) != null ? death.getDeathMessage(player).getString() : "Unknown cause of death";
@@ -127,7 +125,7 @@ public class AiTaunts {
 
     private static Map<String, Object> getRequestBody(ServerPlayerEntity player, String deathMessage) {
         String prompt = String.format(
-                "Generate a funny and creative taunt for a Minecraft player named '%s' who just died. Don't drag one joke on forever, have original ideas. Their death message was '%s'. Only say the taunt, no quotes and also no emojis.",
+                "Generate a funny and creative taunt for a Minecraft player named '%s' who just died. Don't say something stupid or something that doesn't make sense. Don't drag one joke on forever, have original ideas. Their death message was '%s'. Only say the taunt, no quotes and also no emojis.",
                 player.getName().getString(), deathMessage
         );
 
